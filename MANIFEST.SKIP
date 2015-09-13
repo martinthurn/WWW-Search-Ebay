@@ -5,8 +5,10 @@
 blib
 cover_db
 CVS
+dbh
 diff$
 failed
+git
 html
 (?i:ignore)
 (?i:junk)

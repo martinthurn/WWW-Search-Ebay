@@ -136,7 +136,7 @@ use WWW::SearchResult 2.072;
 use WWW::Search::Result;
 
 our
-$VERSION = do { my @r = (q$Revision: 2.271 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 2.272;
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 my $cgi = new CGI;
 
@@ -846,6 +846,8 @@ sub _parse_tree
       } # if
     } # if
 
+  my $iHits = 0;
+
   # The hit count is in one of these tags:
   my @aoResultCountTagset = $self->_get_result_count_elements($tree);
   if (scalar(@aoResultCountTagset) < 1)
@@ -864,10 +866,15 @@ sub _parse_tree
       print STDERR " DDD     matched ($sCount)\n" if (1 < $self->{_debug});
       # Make sure it's an integer:
       $sCount =~ s!,!!g;
-      $self->approximate_result_count($sCount);
+      $self->approximate_result_count(0 + $sCount);
       last FONT;
       } # if
     } # foreach
+
+  if ($self->approximate_result_count() < 1)
+    {
+    return $iHits;
+    } # if
 
   # Recursively parse the stats telling how many items were found in
   # each category:
@@ -895,7 +902,6 @@ sub _parse_tree
     # use File::Slurp;
     # write_file('no-results.html', $self->{response}->content);
     } # unless
-  my $iHits = 0;
   my $qrItemNum = qr{(\d{11,13})};
  TD:
   foreach my $oTDtitle (@aoTD)

@@ -1,3 +1,7 @@
+2015-09-22  Kingpin  <Martin@EV-9D9>
+
+	* lib/WWW/Search/Ebay.pm (_parse_tree): try harder to avoid returning "other" items
+
 2015-09-13  Kingpin  <Martin@EV-9D9>
 
 	* lib/WWW/Search/Ebay.pm: added warning if no results count found

@@ -1014,6 +1014,15 @@ sub _parse_tree
     push(@{$self->{cache}}, $hit);
     $self->{'_num_hits'}++;
     $iHits++;
+
+    if ($self->approximate_result_count() <= $iHits)
+      {
+      # We've already scraped all the hits that eBay said there were.
+      # Stop scraping, so that we don't return hits that are not an
+      # exact match to the query but are just "related":
+      last TD;
+      } # if
+
     # Delete this HTML element so that future searches go faster?
     $oTDtitle->detach;
     $oTDtitle->delete;

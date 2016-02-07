@@ -1,3 +1,7 @@
+2016-02-07  Kingpin  <martin@localhost.localdomain>
+
+	* lib/WWW/Search/Ebay.pm (_parse_shipping): allow shipping to be "unknown"
+
 2015-09-22  Kingpin  <Martin@EV-9D9>
 
 	* lib/WWW/Search/Ebay.pm (_parse_tree): try harder to avoid returning "other" items

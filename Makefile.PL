@@ -3,7 +3,7 @@
 
 use inc::Module::Install;
 
-version(3.044);
+version(3.045);
 all_from('lib/WWW/Search/Ebay.pm');
 
 requires(perl => 5.005);

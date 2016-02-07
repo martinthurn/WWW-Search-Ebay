@@ -1,10 +1,10 @@
 
-# $Id: Ebay.pm,v 2.271 2015-09-13 14:28:54 Martin Exp $
-
 package WWW::Search::Ebay;
 
 use strict;
 use warnings;
+
+our $VERSION = 2.273;
 
 =head1 NAME
 
@@ -135,8 +135,6 @@ use WWW::Search qw( generic_option strip_tags );
 use WWW::SearchResult 2.072;
 use WWW::Search::Result;
 
-our
-$VERSION = 2.272;
 our $MAINTAINER = 'Martin Thurn <mthurn@cpan.org>';
 my $cgi = new CGI;
 
@@ -527,6 +525,11 @@ sub _parse_shipping
   $iPrice =~ s!&Acirc;!!g;
   $iPrice =~ s!Â!!g;
   print STDERR " DDD   raw shipping ===$iPrice===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
+  if ($iPrice =~ m/UNKNOWN/i)
+    {
+    # No shipping info provided:
+    return 1;
+    } # if
   if ($iPrice =~ m/FREE/i)
     {
     $iPrice = 0.00;

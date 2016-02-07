@@ -10,7 +10,7 @@ use Bit::Vector;
 use Data::Dumper;
 use Date::Manip;
 use ExtUtils::testlib;
-use Test::More 'no_plan';
+use Test::More;
 use WWW::Search;
 use WWW::Search::Test;
 
@@ -136,6 +136,8 @@ SKIP_CONTENTS:
 pass('no-op');
 ALL_DONE:
 pass('all done');
+
+done_testing();
 
 __END__
 

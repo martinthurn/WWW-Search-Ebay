@@ -3,7 +3,7 @@
 
 use inc::Module::Install;
 
-version(3.043);
+version(3.044);
 all_from('lib/WWW/Search/Ebay.pm');
 
 requires(perl => 5.005);
@@ -16,8 +16,6 @@ test_requires('IO::Capture::Stderr');
 requires('LWP::Simple');
 # Test::More is needed for `make test`:
 test_requires('Test::More');
-recommends('Test::Pod');
-recommends('Test::Pod::Coverage');
 # We need the version that has methods named with leading underscore:
 requires('WWW::Search' => 2.557);
 # We need the version that has the bidder and seller methods:

@@ -24,6 +24,7 @@ patch$
 \bRCS\b
 t/author
 \bTEST\b
+test.pl
 \.t?gz$
 \.trial$
 uu$

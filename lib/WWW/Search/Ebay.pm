@@ -860,10 +860,10 @@ sub _parse_tree
  FONT:
   foreach my $oFONT (@aoResultCountTagset)
     {
+    my $s = $oFONT->as_text;
     my $qr = $self->_result_count_pattern;
-    print STDERR (" DDD   result_count try ==",
-                  $oFONT->as_text, "== against qr=$qr=\n") if (1 < $self->{_debug});
-    if ($oFONT->as_text =~ m!$qr!)
+    print STDERR (" DDD   result_count try qr=$qr= against ==$s==\n") if (1 < $self->{_debug});
+    if ($s =~ m/$qr/)
       {
       my $sCount = $1;
       print STDERR " DDD     matched ($sCount)\n" if (1 < $self->{_debug});
@@ -872,7 +872,7 @@ sub _parse_tree
       $self->approximate_result_count(0 + $sCount);
       last FONT;
       } # if
-    } # foreach
+    } # foreach FONT
 
   if ($self->approximate_result_count() < 1)
     {

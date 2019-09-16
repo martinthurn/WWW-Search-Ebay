@@ -1,5 +1,5 @@
 
-# $Id: enddate.t,v 1.14 2015-06-06 19:51:07 Martin Exp $
+my $VERSION = 1.15;
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Date::Manip;
 $ENV{TZ} = 'EST5EDT';
 # Date_Init('TZ=EST5EDT');
 use ExtUtils::testlib;
-use Test::More 'no_plan';
+use Test::More;
 use WWW::Search;
 use WWW::Search::Test;
 
@@ -28,6 +28,7 @@ pass('no-op');
 diag("Sending end-date query...");
 $iDebug = 0;
 $iDump = 0;
+$WWW::Search::Test::sSaveOnError = q{enddate-failed.html};
 # We need a query that returns "Featured Items" _and_ items that end
 # in a few minutes.  This one attracts Rock'n'Roll fans and
 # philatelists:
@@ -45,23 +46,28 @@ cmp_ok(0, '<', scalar(@ao), 'got some results');
 my $sDatePrev = 'yesterday';
 foreach my $oResult (@ao)
   {
-  like($oResult->url, qr{\Ahttp://(cgi|www)\d*\.ebay\.com},
+  like($oResult->url, qr{\Ahttps?://(cgi|www)\d*\.ebay\.com},
        'result URL really is from ebay.com');
-  cmp_ok($oResult->title, 'ne', '',
-         'result Title is not empty');
+  my $sTitle = $oResult->title;
+  cmp_ok($sTitle, 'ne', '',
+         qq'result Title ($sTitle) is not empty');
   like($oResult->description, qr{([0-9]+|no)\s+bids?},
        'result bidcount is ok');
   my $sDate = $oResult->change_date || '';
   DEBUG_DATE && diag(qq{raw result date is '$sDate'});
-  diag(Dumper($oResult)) unless isnt($sDate, '');
+  diag(Dumper($oResult)) unless isnt($sDate, '', "change_date ($sDate) is not empty");
+  # It is not possible to test the order of results in this way,
+  # because eBay sometimes sticks paid (advertised) auctions at the
+  # top of the page (and those are not in order).
   my $iCmp = Date_Cmp($sDatePrev, $sDate);
-  cmp_ok($iCmp, '<=', 0, 'result is in order by end date');
+  # cmp_ok($iCmp, '<=', 0, 'result is in order by end date');
   $sDatePrev = $sDate;
   } # foreach
 pass('no-op');
 ALL_DONE:
 pass('no-op');
-exit 0;
+
+done_testing();
 
 __END__
 

@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my $VERSION = 1.04;
+my $VERSION = 1.05;
 
 use blib;
 use Bit::Vector;
@@ -51,7 +51,8 @@ diag("Sending 1-page category query to check contents...");
 $iDebug = 0;
 $iDump = 0;
 $WWW::Search::Test::sSaveOnError = q{category-failed.html};
-tm_run_test('normal', 147399, 1, 199, $iDebug, $iDump);
+# 175817 is "Credit Services"
+tm_run_test('normal', 175817, 1, 199, $iDebug, $iDump);
 # Now get the results and inspect them:
 my @ao = $WWW::Search::Test::oSearch->results();
 cmp_ok(0, '<', scalar(@ao), 'got some results');

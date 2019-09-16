@@ -4,7 +4,7 @@ package WWW::Search::Ebay;
 use strict;
 use warnings;
 
-our $VERSION = 2.273;
+our $VERSION = 2.274;
 
 =head1 NAME
 
@@ -186,6 +186,7 @@ sub _native_setup_search
                          # Output basic HTML, not JavaScript:
                          _armrs => 1,
                         };
+    # https://www.ebay.com/sch/i.html?LH_Auction=1&SortProperty=MetaEndSort&_armrs=1&_ipg=200&_fosrp=1&_nkw=zeppelin&_sop=1
     $self->{_options} = {
                          _nkw => $native_query,
                          _armrs => 1,
@@ -645,10 +646,8 @@ sub result_as_HTML
   my $sPrice = $self->_bidamount_as_text($oSR);
   my $sEndedColor = 'green';
   my $sEndedWord = 'ends';
-  my $dateNow = ParseDate('now');
-  print STDERR " DDD compare end_date ==$dateEnd==\n" if (DEBUG_DATES || (1 < $self->{_debug}));
-  print STDERR " DDD compare date_now ==$dateNow==\n" if (DEBUG_DATES || (1 < $self->{_debug}));
-  if (Date_Cmp($dateEnd, $dateNow) < 0)
+  print STDERR " DDD compare end_date ==$dateEnd== to now\n" if (DEBUG_DATES || (1 < $self->{_debug}));
+  if (Date_Cmp($dateEnd, 'now') < 0)
     {
     $sEndedColor = 'red';
     $sEndedWord = 'ended';
@@ -742,6 +741,7 @@ sub _get_itemtitle_tds
   {
   my $self = shift;
   my $tree = shift;
+  printf STDERR (" TTT this is Ebay::_get_itemtitle_tds") if (1 < $self->{_debug});
   my @ao = $tree->look_down(_tag => 'td',
                             class => 'details',
                            );
@@ -767,6 +767,7 @@ sub _get_itemtitle_tds
                                class => 'lvtitle',
                               );
     } # if
+  # printf STDERR (" DDD found %d itemtitle tags", scalar(@ao)) if (1 < $self->{_debug});
   return @ao;
   } # _get_itemtitle_tds
 
@@ -872,6 +873,10 @@ sub _parse_tree
       $self->approximate_result_count(0 + $sCount);
       last FONT;
       } # if
+    else
+      {
+      print STDERR " WWW     DID NOT MATCH\n" if (1 < $self->{_debug});
+      }
     } # foreach FONT
 
   if ($self->approximate_result_count() < 1)
@@ -901,7 +906,7 @@ sub _parse_tree
   my @aoTD = $self->_get_itemtitle_tds($tree);
   unless (@aoTD)
     {
-    print STDERR " EEE did not find table of results\n" if $self->{_debug};
+    print STDERR " EEE did not find any result title tags\n" if $self->{_debug};
     # use File::Slurp;
     # write_file('no-results.html', $self->{response}->content);
     } # unless
@@ -916,8 +921,15 @@ sub _parse_tree
     # First A tag contains the url & title:
     my $oA = $oTDtitle->look_down('_tag', 'a');
     next TD unless ref $oA;
-    # This is needed for Ebay::UK to make sure we're looking at the right TD:
     my $sTitle = $oA->as_text || '';
+    if ($sTitle eq '')
+      {
+      my $oImg = $oA->look_down(_tag => 'img');
+      if (defined $oImg)
+        {
+        $sTitle = $oImg->attr('alt') || '';
+        } # end if
+      } # end if
     next TD if ($sTitle eq '');
     print STDERR " DDD   sTitle ===$sTitle===\n" if (1 < $self->{_debug});
     my $oURI = URI->new($oA->attr('href'));
@@ -943,7 +955,7 @@ sub _parse_tree
     $hit->bid_count(0);
     # The rest of the info about this item is in sister <LI> elements
     # to the right:
-    my @aoSibs = $oTDtitle->parent->look_down(_tag => q{li});
+    my @aoSibs = $oTDtitle->parent->parent->look_down(_tag => q{li});
     # The parent itself is an <LI> tag:
     shift @aoSibs;
     warn " DDD before loop, there are ", scalar(@aoSibs), " sibling TDs\n" if (1 < $self->{_debug});
@@ -956,6 +968,11 @@ sub _parse_tree
       if ($sColumn eq q{})
         {
         warn " WWW auction info sibling has no class ==$s==" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
+        if ($s =~ m/The item is listed as a Top Rated Plus item/)
+          {
+          # Note: These items screw up the ByEndDate results because
+          # they appear out of order.
+          } # if
         } # if
       print STDERR " DDD   looking at TD'$sColumn' ===$s===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
       if ($sColumn =~ m'price')
@@ -975,7 +992,7 @@ sub _parse_tree
         {
         next TD if ! $self->_parse_enddate($oTDsib, $hit);
         }
-      if ($sColumn =~ 'time')
+      if ($sColumn =~ m'time')
         {
         next TD if ! $self->_parse_enddate($oTDsib, $hit);
         }
@@ -1207,7 +1224,7 @@ Include parentheses so that $1 becomes the number (with commas is OK).
 
 sub _result_count_pattern
   {
-  return qr'([0-9,]+)\s+(active\s+)?(listing|item|matche?|result)s?(\s+found)?';
+  return qr'([0-9,]+)\s+(active\s+)?(listing|item|matche?|result)s?(\s+found)?'i;
   } # _result_count_pattern
 
 

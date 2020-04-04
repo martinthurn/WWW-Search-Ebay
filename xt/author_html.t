@@ -27,7 +27,7 @@ $oICE->start;
 TODO:
   {
   $TODO = 'We only need one page of results in order to test the HTML';
-  tm_run_test('normal', 'zeppelin', 1, 44, $iDebug, $iDump);
+  tm_run_test('normal', 'zeppelin', 1, 99, $iDebug, $iDump);
   }
 $oICE->stop;
 $TODO = '';

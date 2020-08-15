@@ -753,7 +753,7 @@ sub _get_itemtitle_tds
   {
   my $self = shift;
   my $tree = shift;
-  printf STDERR (" TTT this is Ebay::_get_itemtitle_tds") if (1 < $self->{_debug});
+  printf STDERR (" TTT this is Ebay::_get_itemtitle_tds\n") if (1 < $self->{_debug});
   my @ao = $tree->look_down(_tag => 'td',
                             class => 'details',
                            );
@@ -973,7 +973,7 @@ sub _parse_tree
     $hit->bid_count(0);
     # The rest of the info about this item is in sister <LI> elements
     # to the right:
-    my @aoSibs = $oTDtitle->parent->parent->look_down(_tag => q{li});
+    my @aoSibs = $oTDtitle->parent->look_down(_tag => q{li});
     # The parent itself is an <LI> tag:
     shift @aoSibs;
     warn " DDD before loop, there are ", scalar(@aoSibs), " sibling TDs\n" if (1 < $self->{_debug});

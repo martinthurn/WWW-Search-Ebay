@@ -18,8 +18,8 @@ BEGIN
   use_ok('WWW::Search::Ebay');
   } # end of BEGIN block
 
-my $iDebug = 1;
-my $iDump = 1;
+my $iDebug = 0;
+my $iDump = 0;
 
 tm_new_engine('Ebay');
 
